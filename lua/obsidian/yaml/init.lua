@@ -60,7 +60,9 @@ dumps = function(x, indent, order)
     if util.tbl_is_array(x) then
       for _, v in ipairs(x) do
         local item_lines = dumps(v, indent + 2)
-        table.insert(out, indent_str .. "- " .. util.lstrip_whitespace(item_lines[1]))
+        -- Detect the indent string by 2 for canonical YAML lists.
+        local indent_str_to_use = string.rep(" ", math.max(indent - 2, 0))
+        table.insert(out, indent_str_to_use .. "- " .. util.lstrip_whitespace(item_lines[1]))
         for i = 2, #item_lines do
           table.insert(out, item_lines[i])
         end

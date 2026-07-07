@@ -1,5 +1,6 @@
 local Path = require "obsidian.path"
 local abc = require "obsidian.abc"
+local log = require "obsidian.log"
 
 ---@class obsidian.workspace.WorkspaceSpec
 ---
@@ -166,8 +167,14 @@ Workspace.get_workspace_for_dir = function(cur_dir, workspaces)
   end
 
   for _, spec in ipairs(workspaces) do
-    local w = Workspace.new_from_spec(spec)
-    if w.path == cur_dir or w.path:is_parent_of(cur_dir) then
+    local w
+    ok, w = pcall(function()
+      return Workspace.new_from_spec(spec)
+    end)
+
+    if not ok then
+      log.warn_once("Failed to initialize workspace: %s", vim.inspect(spec.path))
+    elseif w.path == cur_dir or w.path:is_parent_of(cur_dir) then
       return w
     end
   end
